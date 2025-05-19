@@ -7,7 +7,7 @@ define('CONTROLLER_PATH', BASE_PATH . '/controllers/');
 define('MODEL_PATH', BASE_PATH . '/models/');
 define('VIEW_PATH', BASE_PATH . '/views/');
 define('ASSET_PATH', BASE_PATH . '/assets/');
-define('UPLOAD_PATH', BASE_PATH . '/foto_sekolah/'); 
+define('UPLOAD_PATH', BASE_PATH . '/foto/'); 
 require_once 'koneksi.php';
 
 $controller = isset($_GET['controller']) ? $_GET['controller'] : 'Auth';
@@ -24,7 +24,7 @@ if (file_exists($controllerFile)) {
     $controllerClass = ucfirst($controller) . 'Controller';
     
     if (class_exists($controllerClass)) {
-        $controllerObj = new $controllerClass();
+      $controllerObj = new $controllerClass($koneksi);
         
         if (method_exists($controllerObj, $action)) {
             $controllerObj->$action();

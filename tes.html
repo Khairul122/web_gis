@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Peta Gabungan Kotanopan & Panyabungan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Leaflet CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 2px solid #007bff;
+        }
+        .iframe-container {
+            border: 2px solid #28a745;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Peta Batas Wilayah Kotanopan (Leaflet) & Peta Panyabungan (Google Maps)</h2>
+
+    <!-- Leaflet Map -->
+    <div id="map"></div>
+
+    <!-- Google Maps Iframe -->
+    <div class="iframe-container">
+        <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127666.81374953523!2d99.72274295!3d0.6157374999999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x302bbe8501724173%3A0xdc65624e51420dbd!2sKec.%20Panyabungan%2C%20Kabupaten%20Mandailing%20Natal%2C%20Sumatera%20Utara!5e0!3m2!1sid!2sid!4v1747650055406!5m2!1sid!2sid" 
+            width="100%" 
+            height="450" 
+            style="border:0;" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+    </div>
+
+    <!-- Leaflet Script -->
+    <script>
+        var map = L.map('map').setView([0.6157, 99.4108], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Contoh batas wilayah Kotanopan (biru)
+        var batasKotanopan = {
+            "type": "Feature",
+            "properties": { "nama": "Kotanopan" },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[
+                    [99.3700, 0.6200],
+                    [99.3800, 0.6500],
+                    [99.4100, 0.6700],
+                    [99.4400, 0.6400],
+                    [99.4300, 0.6000],
+                    [99.3900, 0.5900],
+                    [99.3700, 0.6200]
+                ]]
+            }
+        };
+
+        L.geoJSON(batasKotanopan, {
+            style: {
+                color: 'blue',
+                weight: 2,
+                fillOpacity: 0.2
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup("Wilayah: " + feature.properties.nama);
+            }
+        }).addTo(map);
+    </script>
+
+</body>
+</html>
