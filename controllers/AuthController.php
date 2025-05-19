@@ -28,7 +28,7 @@ class AuthController
                 if ($user['level'] === 'admin') {
                     header('Location: index.php?controller=Dashboard&action=index');
                 } else {
-                    header('Location: index.php?controller=User&action=index');
+                    header('Location: index.php?controller=Dashboard&action=index');
                 }
                 exit;
             } else {
