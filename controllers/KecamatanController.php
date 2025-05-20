@@ -5,8 +5,9 @@ class KecamatanController
 {
     private $model;
 
-    public function __construct($koneksi)
+    public function __construct()
     {
+        global $koneksi;
         $this->model = new KecamatanModel($koneksi);
     }
 
@@ -29,29 +30,38 @@ class KecamatanController
     {
         $data = [
             'nama_kecamatan' => $_POST['nama_kecamatan'],
-            'latitude' => $_POST['latitude'],
-            'longitude' => $_POST['longitude'],
             'luas' => $_POST['luas'],
             'keterangan' => $_POST['keterangan']
         ];
 
-        if (!empty($_POST['id_kecamatan'])) {
-            $this->model->update($_POST['id_kecamatan'], $data);
-        } else {
-            $this->model->insert($data);
+        $geojsonPath = null;
+        if (!empty($_FILES['geojson']['tmp_name'])) {
+            $originalName = basename($_FILES['geojson']['name']);
+            $targetPath = UPLOAD_GEOJSON_PATH . $originalName;
+
+            if (move_uploaded_file($_FILES['geojson']['tmp_name'], $targetPath)) {
+                $geojsonPath =  $originalName;
+            } else {
+                die("Gagal menyimpan file GeoJSON.");
+            }
         }
 
-        header("Location: index.php?controller=kecamatan&action=index");
+        if (!empty($_POST['id_kecamatan'])) {
+            $this->model->update($_POST['id_kecamatan'], $data, $geojsonPath);
+        } else {
+            $this->model->insert($data, $geojsonPath);
+        }
+
+        header('Location: index.php?controller=Kecamatan&action=index');
         exit;
     }
 
-    public function hapus()
+    public function delete()
     {
         if (isset($_GET['id'])) {
             $this->model->delete($_GET['id']);
         }
-
-        header("Location: index.php?controller=kecamatan&action=index");
+        header('Location: index.php?controller=Kecamatan&action=index');
         exit;
     }
 }

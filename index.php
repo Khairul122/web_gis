@@ -8,6 +8,7 @@ define('MODEL_PATH', BASE_PATH . '/models/');
 define('VIEW_PATH', BASE_PATH . '/views/');
 define('ASSET_PATH', BASE_PATH . '/assets/');
 define('UPLOAD_PATH', BASE_PATH . '/foto/'); 
+define('UPLOAD_GEOJSON_PATH', BASE_PATH . '/geojson/');
 require_once 'koneksi.php';
 
 $controller = isset($_GET['controller']) ? $_GET['controller'] : 'Auth';

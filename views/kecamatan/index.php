@@ -6,62 +6,67 @@
     <div class="container-fluid page-body-wrapper">
       <?php include 'template/setting_panel.php'; ?>
       <?php include 'template/sidebar.php'; ?>
-
       <div class="main-panel">
         <div class="content-wrapper">
-          <div class="row mb-3">
-            <div class="col-sm-12 d-flex justify-content-between align-items-center">
-              <h4 class="fw-bold">Data Kecamatan</h4>
-              <a href="index.php?controller=kecamatan&action=form" class="btn btn-primary btn-sm">+ Tambah Kecamatan</a>
-            </div>
-          </div>
-
           <div class="row">
             <div class="col-sm-12">
-              <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                  <thead class="table-light">
-                    <tr>
-                      <th>No</th>
-                      <th>Nama Kecamatan</th>
-                      <th>Latitude</th>
-                      <th>Longitude</th>
-                      <th>Luas (km²)</th>
-                      <th>Keterangan</th>
-                      <th>Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php if (!empty($data)) : ?>
-                      <?php $no = 1; foreach ($data as $row) : ?>
-                        <tr>
-                          <td><?= $no++ ?></td>
-                          <td><?= $row['nama_kecamatan'] ?></td>
-                          <td><?= $row['latitude'] ?></td>
-                          <td><?= $row['longitude'] ?></td>
-                          <td><?= $row['luas'] ?></td>
-                          <td><?= $row['keterangan'] ?></td>
-                          <td>
-                            <a href="index.php?controller=kecamatan&action=form&id=<?= $row['id_kecamatan'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="index.php?controller=kecamatan&action=hapus&id=<?= $row['id_kecamatan'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
-                          </td>
-                        </tr>
-                      <?php endforeach; ?>
-                    <?php else : ?>
-                      <tr>
-                        <td colspan="7" class="text-center">Belum ada data kecamatan.</td>
-                      </tr>
-                    <?php endif; ?>
-                  </tbody>
-                </table>
+
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="font-weight-bold">Data Kecamatan</h4>
+                <a href="index.php?controller=Kecamatan&action=form" class="btn btn-primary btn-sm">+ Tambah Kecamatan</a>
               </div>
+
+              <div class="card">
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                      <thead class="thead-light">
+                        <tr>
+                          <th>No</th>
+                          <th>Nama Kecamatan</th>
+                          <th>Luas (km²)</th>
+                          <th>Keterangan</th>
+                          <th>GeoJSON</th>
+                          <th>Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <?php $no = 1; foreach ($data as $row) : ?>
+                          <tr>
+                            <td><?= $no++ ?></td>
+                            <td><?= htmlspecialchars($row['nama_kecamatan']) ?></td>
+                            <td><?= htmlspecialchars($row['luas']) ?></td>
+                            <td><?= htmlspecialchars($row['keterangan']) ?></td>
+                            <td>
+                              <?php if (!empty($row['data_geojson'])) : ?>
+                                <a href="index.php?controller=Geojson&action=preview&file=<?= basename($row['data_geojson']) ?>" target="_blank" class="btn btn-sm btn-info">Lihat</a>
+                              <?php else : ?>
+                                <span class="text-muted">Tidak Ada</span>
+                              <?php endif; ?>
+                            </td>
+                            <td>
+                              <a href="index.php?controller=Kecamatan&action=form&id=<?= $row['id_kecamatan'] ?>" class="btn btn-sm btn-warning">Edit</a>
+                              <a href="index.php?controller=Kecamatan&action=delete&id=<?= $row['id_kecamatan'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
+                            </td>
+                          </tr>
+                        <?php endforeach; ?>
+                        <?php if (empty($data)) : ?>
+                          <tr>
+                            <td colspan="6" class="text-center">Belum ada data kecamatan.</td>
+                          </tr>
+                        <?php endif; ?>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
   <?php include 'template/script.php'; ?>
 </body>
 </html>
