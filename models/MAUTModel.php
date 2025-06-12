@@ -1,7 +1,7 @@
 <?php
 class MAUTModel
 {
-    private $db;
+    public $db;
 
     public function __construct($koneksi)
     {
@@ -260,12 +260,169 @@ class MAUTModel
         return $ranking;
     }
 
-    public function exportToCSV($data, $filename = 'hasil_maut.csv')
+    public function exportToCSV($filename = null)
+    {
+        if ($filename === null) {
+            $filename = 'Laporan_MAUT_' . date('Y-m-d_H-i-s') . '.csv';
+        }
+        
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        
+        $output = fopen('php://output', 'w');
+        
+        fwrite($output, "\xEF\xBB\xBF");
+        
+        $kriteria = $this->getKriteriaData();
+        $kecamatan = $this->getKecamatanData();
+        $matrix = $this->getMatrixData();
+        $minMax = $this->calculateMinMaxValues();
+        $utility = $this->calculateUtilityValues();
+        $scores = $this->calculateMAUTScore();
+        $ranking = $this->getRanking();
+        
+        fputcsv($output, ['LAPORAN PERHITUNGAN MAUT']);
+        fputcsv($output, ['Tanggal Generate: ' . date('d F Y H:i:s')]);
+        fputcsv($output, ['']);
+        
+        fputcsv($output, ['1. DATA KRITERIA']);
+        fputcsv($output, ['ID Kriteria', 'Nama Kriteria', 'Bobot', 'Bobot (%)', 'Keterangan']);
+        
+        foreach ($kriteria as $k) {
+            fputcsv($output, [
+                $k['id_kriteria'],
+                $k['nama_kriteria'],
+                $k['bobot'],
+                round($k['bobot'] * 100, 1) . '%',
+                $k['keterangan'] ?? '-'
+            ]);
+        }
+        fputcsv($output, ['']);
+        
+        fputcsv($output, ['2. MATRIKS PENILAIAN']);
+        $header_matrix = ['Kecamatan'];
+        foreach ($kriteria as $k) {
+            $header_matrix[] = $k['nama_kriteria'];
+        }
+        fputcsv($output, $header_matrix);
+        
+        foreach ($kecamatan as $kec) {
+            $row = [$kec['nama_kecamatan']];
+            foreach ($kriteria as $k) {
+                $nilai = isset($matrix[$kec['id_kecamatan']][$k['id_kriteria']]) 
+                        ? $matrix[$kec['id_kecamatan']][$k['id_kriteria']]['nilai'] 
+                        : 0;
+                $row[] = $nilai;
+            }
+            fputcsv($output, $row);
+        }
+        fputcsv($output, ['']);
+        
+        fputcsv($output, ['3. NILAI MIN-MAX']);
+        fputcsv($output, ['Kriteria', 'Nilai Minimum', 'Nilai Maksimum', 'Range', 'Bobot']);
+        
+        foreach ($minMax as $data) {
+            fputcsv($output, [
+                $data['nama_kriteria'],
+                $data['min'],
+                $data['max'],
+                $data['max'] - $data['min'],
+                round($data['bobot'] * 100, 1) . '%'
+            ]);
+        }
+        fputcsv($output, ['']);
+        
+        fputcsv($output, ['4. NORMALISASI UTILITY']);
+        $header_utility = ['Kecamatan'];
+        foreach ($kriteria as $k) {
+            $header_utility[] = $k['nama_kriteria'] . ' (Asli)';
+            $header_utility[] = $k['nama_kriteria'] . ' (Utility)';
+        }
+        fputcsv($output, $header_utility);
+        
+        foreach ($kecamatan as $kec) {
+            if (!isset($utility[$kec['id_kecamatan']])) continue;
+            
+            $row = [$kec['nama_kecamatan']];
+            foreach ($kriteria as $k) {
+                if (isset($utility[$kec['id_kecamatan']][$k['id_kriteria']])) {
+                    $data = $utility[$kec['id_kecamatan']][$k['id_kriteria']];
+                    $row[] = $data['nilai_asli'];
+                    $row[] = $data['nilai_utilitas'];
+                } else {
+                    $row[] = 0;
+                    $row[] = 0;
+                }
+            }
+            fputcsv($output, $row);
+        }
+        fputcsv($output, ['']);
+        
+        fputcsv($output, ['5. PERHITUNGAN SKOR MAUT']);
+        $header_score = ['Kecamatan'];
+        foreach ($kriteria as $k) {
+            $header_score[] = $k['nama_kriteria'] . ' (Terbobot)';
+        }
+        $header_score[] = 'Total Skor';
+        fputcsv($output, $header_score);
+        
+        foreach ($kecamatan as $kec) {
+            if (!isset($utility[$kec['id_kecamatan']])) continue;
+            
+            $row = [$kec['nama_kecamatan']];
+            foreach ($kriteria as $k) {
+                if (isset($utility[$kec['id_kecamatan']][$k['id_kriteria']])) {
+                    $nilai_terbobot = $utility[$kec['id_kecamatan']][$k['id_kriteria']]['nilai_terbobot'];
+                    $row[] = $nilai_terbobot;
+                } else {
+                    $row[] = 0;
+                }
+            }
+            $total_score = isset($scores[$kec['id_kecamatan']]) ? $scores[$kec['id_kecamatan']]['total_score'] : 0;
+            $row[] = $total_score;
+            fputcsv($output, $row);
+        }
+        fputcsv($output, ['']);
+        
+        fputcsv($output, ['6. RANKING FINAL']);
+        fputcsv($output, ['Rank', 'Kecamatan', 'Total Skor', 'Persentase (%)', 'Kategori']);
+        
+        foreach ($ranking as $rank) {
+            $persentase = $rank['persentase'];
+            $kategori = '';
+            
+            if ($persentase >= 80) {
+                $kategori = 'Sangat Sesuai';
+            } elseif ($persentase >= 60) {
+                $kategori = 'Sesuai';
+            } elseif ($persentase >= 40) {
+                $kategori = 'Cukup Sesuai';
+            } else {
+                $kategori = 'Kurang Sesuai';
+            }
+            
+            fputcsv($output, [
+                $rank['rank'],
+                $rank['nama_kecamatan'],
+                $rank['total_score'],
+                $rank['persentase'] . '%',
+                $kategori
+            ]);
+        }
+        
+        fclose($output);
+        exit;
+    }
+
+    public function exportRankingToCSV($data, $filename = 'ranking_maut.csv')
     {
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=' . $filename);
         
         $output = fopen('php://output', 'w');
+        
+        fwrite($output, "\xEF\xBB\xBF");
         
         fputcsv($output, ['Ranking', 'Kecamatan', 'Total Score', 'Persentase (%)']);
         
@@ -281,5 +438,12 @@ class MAUTModel
         
         fclose($output);
         exit;
+    }
+
+    public function clearAnalysisData()
+    {
+        $this->db->query("DELETE FROM detail_analisis");
+        $this->db->query("DELETE FROM hasil_analisis");
+        return true;
     }
 }
