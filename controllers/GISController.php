@@ -34,4 +34,12 @@ class GISController
         echo json_encode($this->model->getGeoJSONAPI());
         exit;
     }
+
+    public function petaUser()
+    {
+        $data = [
+            'kecamatan_maut' => $this->model->getKecamatanWithMAUT()
+        ];
+        include VIEW_PATH . 'peta/index.php';
+    }
 }

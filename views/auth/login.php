@@ -74,7 +74,15 @@
       color: #e1f5fe;
     }
     
-    .login-btn {
+    .action-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+    
+    .action-btn {
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(10px);
       border: 2px solid rgba(255,255,255,0.3);
@@ -85,13 +93,33 @@
       border-radius: 50px;
       transition: all 0.3s ease;
       box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      min-width: 200px;
+      justify-content: center;
     }
     
-    .login-btn:hover {
+    .action-btn:hover {
       background: rgba(255,255,255,0.3);
       transform: translateY(-2px);
       box-shadow: 0 12px 35px rgba(0,0,0,0.3);
       color: white;
+      text-decoration: none;
+    }
+    
+    .btn-login {
+      background: rgba(255,255,255,0.25);
+      border-color: rgba(255,255,255,0.4);
+    }
+    
+    .btn-guest {
+      background: rgba(76, 175, 80, 0.3);
+      border-color: rgba(76, 175, 80, 0.5);
+    }
+    
+    .btn-guest:hover {
+      background: rgba(76, 175, 80, 0.4);
     }
     
     .modal-content {
@@ -136,7 +164,7 @@
       box-shadow: 0 0 0 0.2rem rgba(41, 182, 246, 0.25);
     }
     
-    .btn-login {
+    .btn-login-modal {
       background: linear-gradient(135deg, #4fc3f7, #29b6f6);
       border: none;
       border-radius: 25px;
@@ -148,7 +176,7 @@
       transition: all 0.3s ease;
     }
     
-    .btn-login:hover {
+    .btn-login-modal:hover {
       background: linear-gradient(135deg, #29b6f6, #0288d1);
       transform: translateY(-1px);
       box-shadow: 0 8px 25px rgba(41, 182, 246, 0.4);
@@ -244,6 +272,38 @@
       text-decoration: underline;
     }
     
+    .guest-info {
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 30px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .guest-info h5 {
+      margin-bottom: 15px;
+      color: #fff3e0;
+    }
+    
+    .guest-info ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .guest-info li {
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+    
+    .guest-info li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #4caf50;
+      font-weight: bold;
+    }
+    
     @media (max-width: 768px) {
       .hero-title {
         font-size: 1.8rem;
@@ -261,9 +321,15 @@
         font-size: 1.2rem;
       }
       
-      .login-btn {
+      .action-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .action-btn {
         padding: 12px 30px;
         font-size: 1rem;
+        min-width: 250px;
       }
     }
   </style>
@@ -300,10 +366,18 @@
         STUDI KASUS: KABUPATEN MANDAILING NATAL
       </h4>
       
-      <button type="button" class="btn login-btn" data-bs-toggle="modal" data-bs-target="#loginModal">
-        <i class="bi bi-box-arrow-in-right me-2"></i>
-        MASUK SISTEM
-      </button>
+      <div class="action-buttons">
+        <button type="button" class="action-btn btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">
+          <i class="bi bi-shield-lock me-2"></i>
+          LOGIN ADMINISTRATOR
+        </button>
+        
+        <a href="index.php?controller=GIS&action=petaUser" class="action-btn btn-guest">
+          <i class="bi bi-map me-2"></i>
+          LIHAT PETA UMUM
+        </a>
+      </div>
+    
     </div>
   </div>
 
@@ -312,8 +386,8 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="loginModalLabel">
-            <i class="bi bi-person-circle me-2"></i>
-            Login Sistem
+            <i class="bi bi-shield-lock me-2"></i>
+            Login Administrator
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -327,7 +401,7 @@
                 Username
               </label>
               <input type="text" class="form-control" id="username" name="username" required 
-                     placeholder="Masukkan username Anda">
+                     placeholder="Masukkan username administrator">
             </div>
             
             <div class="mb-4">
@@ -336,17 +410,17 @@
                 Password
               </label>
               <input type="password" class="form-control" id="password" name="password" required 
-                     placeholder="Masukkan password Anda">
+                     placeholder="Masukkan password administrator">
             </div>
             
-            <button type="submit" class="btn btn-login">
+            <button type="submit" class="btn btn-login-modal">
               <i class="bi bi-box-arrow-in-right me-2"></i>
-              MASUK
+              MASUK SISTEM
             </button>
           </form>
           
           <div class="register-link">
-            <p class="mb-0">Belum memiliki akun? 
+            <p class="mb-0">Belum memiliki akun administrator? 
               <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">
                 Daftar di sini
               </a>
@@ -363,121 +437,5 @@
         <div class="modal-header">
           <h5 class="modal-title" id="registerModalLabel">
             <i class="bi bi-person-plus me-2"></i>
-            Registrasi Akun Baru
+            Registrasi Administrator
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="register-alert-container"></div>
-          
-          <form id="registerForm" method="POST" action="index.php?controller=Auth&action=register">
-            <div class="mb-3">
-              <label for="reg_username" class="form-label">
-                <i class="bi bi-person me-1"></i>
-                Username
-              </label>
-              <input type="text" class="form-control" id="reg_username" name="username" required 
-                     placeholder="Pilih username unik">
-            </div>
-            
-            <div class="mb-3">
-              <label for="reg_nama_lengkap" class="form-label">
-                <i class="bi bi-card-text me-1"></i>
-                Nama Lengkap
-              </label>
-              <input type="text" class="form-control" id="reg_nama_lengkap" name="nama_lengkap" required 
-                     placeholder="Masukkan nama lengkap">
-            </div>
-            
-            <div class="mb-3">
-              <label for="reg_password" class="form-label">
-                <i class="bi bi-lock me-1"></i>
-                Password
-              </label>
-              <input type="password" class="form-control" id="reg_password" name="password" required 
-                     placeholder="Buat password yang kuat">
-            </div>
-            
-            <div class="mb-4">
-              <label for="reg_confirm_password" class="form-label">
-                <i class="bi bi-lock-fill me-1"></i>
-                Konfirmasi Password
-              </label>
-              <input type="password" class="form-control" id="reg_confirm_password" name="confirm_password" required 
-                     placeholder="Ulangi password">
-            </div>
-            
-            <button type="submit" class="btn btn-login">
-              <i class="bi bi-person-plus me-2"></i>
-              DAFTAR
-            </button>
-          </form>
-          
-          <div class="register-link">
-            <p class="mb-0">Sudah memiliki akun? 
-              <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">
-                Login di sini
-              </a>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const status = urlParams.get('status');
-      
-      function showAlert(container, type, message) {
-        const alertHtml = `
-          <div class="alert alert-${type} alert-custom alert-dismissible fade show" role="alert">
-            <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-        `;
-        document.getElementById(container).innerHTML = alertHtml;
-      }
-      
-      if (status === 'failed') {
-        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-        loginModal.show();
-        showAlert('alert-container', 'danger', 'Login gagal! Username atau password salah.');
-      } else if (status === 'registered') {
-        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-        loginModal.show();
-        showAlert('alert-container', 'success', 'Registrasi berhasil! Silakan login dengan akun baru Anda.');
-      } else if (status === 'logout') {
-        showAlert('alert-container', 'info', 'Anda berhasil logout. Terima kasih telah menggunakan sistem.');
-      } else if (status === 'register_failed') {
-        const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
-        registerModal.show();
-        showAlert('register-alert-container', 'danger', 'Registrasi gagal! Username mungkin sudah digunakan.');
-      }
-      
-      document.getElementById('registerForm').addEventListener('submit', function(e) {
-        const password = document.getElementById('reg_password').value;
-        const confirmPassword = document.getElementById('reg_confirm_password').value;
-        
-        if (password !== confirmPassword) {
-          e.preventDefault();
-          showAlert('register-alert-container', 'danger', 'Password dan konfirmasi password tidak cocok!');
-        }
-      });
-      
-      document.getElementById('loginForm').addEventListener('submit', function(e) {
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value.trim();
-        
-        if (!username || !password) {
-          e.preventDefault();
-          showAlert('alert-container', 'danger', 'Username dan password harus diisi!');
-        }
-      });
-    });
-  </script>
-</body>
-</html>
