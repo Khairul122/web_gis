@@ -476,14 +476,7 @@
               MASUK SISTEM
             </button>
           </form>
-          
-          <div class="register-link">
-            <p class="mb-0">Belum memiliki akun administrator? 
-              <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">
-                Daftar di sini
-              </a>
-            </p>
-          </div>
+        
         </div>
       </div>
     </div>
