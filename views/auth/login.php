@@ -183,6 +183,25 @@
       color: white;
     }
     
+    .btn-register-modal {
+      background: linear-gradient(135deg, #4caf50, #388e3c);
+      border: none;
+      border-radius: 25px;
+      padding: 12px 30px;
+      font-weight: 600;
+      color: white;
+      width: 100%;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-register-modal:hover {
+      background: linear-gradient(135deg, #388e3c, #2e7d32);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+      color: white;
+    }
+    
     .floating-shapes {
       position: absolute;
       top: 0;
@@ -270,6 +289,46 @@
     .register-link a:hover {
       color: #0288d1;
       text-decoration: underline;
+    }
+    
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+    }
+    
+    .login-link a {
+      color: #4caf50;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .login-link a:hover {
+      color: #388e3c;
+      text-decoration: underline;
+    }
+    
+    .alert {
+      border-radius: 15px;
+      border: none;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+    
+    .alert-danger {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+    
+    .alert-success {
+      background-color: #e8f5e8;
+      color: #2e7d32;
+    }
+    
+    .alert-info {
+      background-color: #e3f2fd;
+      color: #1565c0;
     }
     
     .guest-info {
@@ -377,7 +436,6 @@
           LIHAT PETA UMUM
         </a>
       </div>
-    
     </div>
   </div>
 
@@ -392,7 +450,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div id="alert-container"></div>
+          <div id="alert-container-login"></div>
           
           <form id="loginForm" method="POST" action="index.php?controller=Auth&action=login">
             <div class="mb-3">
@@ -439,3 +497,319 @@
             <i class="bi bi-person-plus me-2"></i>
             Registrasi Administrator
           </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="alert-container-register"></div>
+          
+          <form id="registerForm" method="POST" action="index.php?controller=Auth&action=register">
+            <div class="mb-3">
+              <label for="reg-nama" class="form-label">
+                <i class="bi bi-person me-1"></i>
+                Nama Lengkap
+              </label>
+              <input type="text" class="form-control" id="reg-nama" name="nama" required 
+                     placeholder="Masukkan nama lengkap">
+            </div>
+            
+            <div class="mb-3">
+              <label for="reg-email" class="form-label">
+                <i class="bi bi-envelope me-1"></i>
+                Email
+              </label>
+              <input type="email" class="form-control" id="reg-email" name="email" required 
+                     placeholder="Masukkan email administrator">
+            </div>
+            
+            <div class="mb-3">
+              <label for="reg-username" class="form-label">
+                <i class="bi bi-person-circle me-1"></i>
+                Username
+              </label>
+              <input type="text" class="form-control" id="reg-username" name="username" required 
+                     placeholder="Masukkan username administrator">
+            </div>
+            
+            <div class="mb-3">
+              <label for="reg-password" class="form-label">
+                <i class="bi bi-lock me-1"></i>
+                Password
+              </label>
+              <input type="password" class="form-control" id="reg-password" name="password" required 
+                     placeholder="Masukkan password">
+            </div>
+            
+            <div class="mb-4">
+              <label for="reg-confirm-password" class="form-label">
+                <i class="bi bi-lock-fill me-1"></i>
+                Konfirmasi Password
+              </label>
+              <input type="password" class="form-control" id="reg-confirm-password" name="confirm_password" required 
+                     placeholder="Konfirmasi password">
+            </div>
+            
+            <button type="submit" class="btn btn-register-modal">
+              <i class="bi bi-person-plus me-2"></i>
+              DAFTAR SEKARANG
+            </button>
+          </form>
+          
+          <div class="login-link">
+            <p class="mb-0">Sudah memiliki akun administrator? 
+              <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">
+                Login di sini
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      
+      if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const username = document.getElementById('username').value.trim();
+          const password = document.getElementById('password').value.trim();
+          const alertContainer = document.getElementById('alert-container-login');
+          
+          alertContainer.innerHTML = '';
+          
+          if (username === '' || password === '') {
+            showAlert('alert-container-login', 'Username dan password harus diisi!', 'danger');
+            return;
+          }
+          
+          if (username.length < 3) {
+            showAlert('alert-container-login', 'Username minimal 3 karakter!', 'danger');
+            return;
+          }
+          
+
+          
+          showAlert('alert-container-login', 'Memproses login...', 'info');
+          
+          const formData = new FormData(loginForm);
+          
+          fetch('index.php?controller=Auth&action=login', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          })
+          .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return response.text().then(text => {
+              console.log('Raw response:', text);
+              
+              let jsonText = text;
+              if (text.includes('{"')) {
+                const jsonStart = text.indexOf('{"');
+                jsonText = text.substring(jsonStart);
+                console.log('Cleaned JSON:', jsonText);
+              }
+              
+              try {
+                return JSON.parse(jsonText);
+              } catch (e) {
+                console.error('JSON parse error:', e);
+                console.error('Response text:', text);
+                throw new Error('Server returned invalid JSON: ' + text.substring(0, 100));
+              }
+            });
+          })
+          .then(data => {
+            console.log('Parsed data:', data);
+            if (data.success) {
+              showAlert('alert-container-login', data.message || 'Login berhasil! Mengalihkan...', 'success');
+              setTimeout(() => {
+                window.location.href = data.redirect || 'index.php?controller=Dashboard&action=index';
+              }, 1500);
+            } else {
+              showAlert('alert-container-login', data.message || 'Login gagal!', 'danger');
+            }
+          })
+          .catch(error => {
+            console.error('Login error:', error);
+            showAlert('alert-container-login', `Terjadi kesalahan: ${error.message}`, 'danger');
+          });
+        });
+      }
+      
+      if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const nama = document.getElementById('reg-nama').value.trim();
+          const email = document.getElementById('reg-email').value.trim();
+          const username = document.getElementById('reg-username').value.trim();
+          const password = document.getElementById('reg-password').value.trim();
+          const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
+          const alertContainer = document.getElementById('alert-container-register');
+          
+          alertContainer.innerHTML = '';
+          
+          if (nama === '' || email === '' || username === '' || password === '' || confirmPassword === '') {
+            showAlert('alert-container-register', 'Semua field harus diisi!', 'danger');
+            return;
+          }
+          
+          if (nama.length < 3) {
+            showAlert('alert-container-register', 'Nama minimal 3 karakter!', 'danger');
+            return;
+          }
+          
+          if (!isValidEmail(email)) {
+            showAlert('alert-container-register', 'Format email tidak valid!', 'danger');
+            return;
+          }
+          
+          if (username.length < 3) {
+            showAlert('alert-container-register', 'Username minimal 3 karakter!', 'danger');
+            return;
+          }
+          
+
+          
+          if (password !== confirmPassword) {
+            showAlert('alert-container-register', 'Konfirmasi password tidak cocok!', 'danger');
+            return;
+          }
+          
+          showAlert('alert-container-register', 'Memproses registrasi...', 'info');
+          
+          const formData = new FormData(registerForm);
+          
+          fetch('index.php?controller=Auth&action=register', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          })
+          .then(response => {
+            console.log('Register response status:', response.status);
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return response.text().then(text => {
+              console.log('Register raw response:', text);
+              try {
+                return JSON.parse(text);
+              } catch (e) {
+                console.error('Register JSON parse error:', e);
+                console.error('Register response text:', text);
+                throw new Error('Server returned invalid JSON: ' + text.substring(0, 100));
+              }
+            });
+          })
+          .then(data => {
+            console.log('Register parsed data:', data);
+            if (data.success) {
+              showAlert('alert-container-register', data.message || 'Registrasi berhasil! Silakan login.', 'success');
+              setTimeout(() => {
+                const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                registerModal.hide();
+                loginModal.show();
+              }, 2000);
+            } else {
+              showAlert('alert-container-register', data.message || 'Registrasi gagal!', 'danger');
+            }
+          })
+          .catch(error => {
+            console.error('Register error:', error);
+            showAlert('alert-container-register', `Terjadi kesalahan: ${error.message}`, 'danger');
+          });
+        });
+      }
+    });
+    
+    function showAlert(containerId, message, type) {
+      const container = document.getElementById(containerId);
+      const alertClass = type === 'danger' ? 'alert-danger' : 
+                        type === 'success' ? 'alert-success' : 
+                        type === 'info' ? 'alert-info' : 'alert-warning';
+      
+      const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+          <i class="bi bi-${type === 'danger' ? 'exclamation-triangle' : 
+                           type === 'success' ? 'check-circle' : 
+                           type === 'info' ? 'info-circle' : 'exclamation-circle'} me-2"></i>
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+      
+      container.innerHTML = alertHtml;
+    }
+    
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+    
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-3px) scale(1.05)';
+      });
+      
+      btn.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+      });
+    });
+    
+    window.addEventListener('scroll', function() {
+      const shapes = document.querySelectorAll('.shape');
+      const scrollY = window.scrollY;
+      
+      shapes.forEach((shape, index) => {
+        const speed = (index + 1) * 0.5;
+        shape.style.transform = `translateY(${scrollY * speed}px)`;
+      });
+    });
+    
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('hidden.bs.modal', function() {
+        const forms = modal.querySelectorAll('form');
+        forms.forEach(form => form.reset());
+        
+        const alerts = modal.querySelectorAll('.alert');
+        alerts.forEach(alert => alert.remove());
+      });
+    });
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    });
+    
+    document.querySelectorAll('.hero-content > *').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'all 0.6s ease';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
